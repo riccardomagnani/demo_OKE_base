@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digitalsignchecker
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  selector:
+    matchLabels:
+      app: core
+      role: digitalsignchecker
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  paused: false
+  replicas: {{ .Values.digitalsignchecker.spec.replicas }}  
+  template:
+    metadata:
+      labels:
+        app: core
+        role: digitalsignchecker
+#        version: {{ .Values.digitalsignchecker.spec.template.spec.containers.version }}
+    spec:
+      containers:
+      - name: digitalsignchecker
+        resources:
+          limits:
+            cpu: "{{ .Values.digitalsignchecker.spec.template.spec.containers.cpu.limits }}"  
+            memory: "{{ .Values.digitalsignchecker.spec.template.spec.containers.memory.limits }}"  
+          requests:
+            cpu: "{{ .Values.digitalsignchecker.spec.template.spec.containers.cpu.requests }}"  
+            memory: "{{ .Values.digitalsignchecker.spec.template.spec.containers.memory.requests }}"  
+        image: {{ .Values.digitalsignchecker.spec.template.spec.containers.image }}:{{ .Values.digitalsignchecker.spec.template.spec.containers.version }}
+
+
+        ports: 
+        - containerPort: {{ .Values.digitalsignchecker.spec.template.spec.containers.ports.containerPort }}  
+        volumeMounts:
+         - name: tz-config
+           mountPath: /etc/localtime                                       
+      volumes:
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/Europe/Rome                
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: digitalsignchecker-service
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: {{ .Values.services.digitalsignchecker.spec.ports.targetPort }}
+  selector:
+    app: core
+    role: digitalsignchecker
+

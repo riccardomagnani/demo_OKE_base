@@ -1,0 +1,14 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: pdf-generation
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  minReplicas: {{ .Values.pdfGeneration.horizontalPodAutoscaler.spec.minReplicas }}
+  maxReplicas: {{ .Values.pdfGeneration.horizontalPodAutoscaler.spec.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.pdfGeneration.horizontalPodAutoscaler.spec.targetCPUUtilizationPercentage }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: pdf-generation
+

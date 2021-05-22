@@ -1,0 +1,13 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend-ui
+  namespace: {{ .Values.namespaces.mainAppNamespace }}
+spec:
+  minReplicas: {{ .Values.frontendui.horizontalPodAutoscaler.spec.minReplicas }}
+  maxReplicas: {{ .Values.frontendui.horizontalPodAutoscaler.spec.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.frontendui.horizontalPodAutoscaler.spec.targetCPUUtilizationPercentage }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: frontend-ui

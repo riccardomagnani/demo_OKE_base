@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdf-generation
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  selector:
+    matchLabels:
+      app: core
+      role: pdf-generation
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  paused: false
+  replicas: {{ .Values.pdfGeneration.spec.replicas }}  
+  template:
+    metadata:
+      labels:
+        app: core
+        role: pdf-generation
+#        version: {{ .Values.pdfGeneration.spec.template.spec.containers.version }}
+    spec:
+      containers:
+      - name: pdf-generation
+        resources:
+          limits:
+            cpu: "{{ .Values.frontendui.spec.template.spec.containers.cpu.limits }}"   
+            memory: "{{ .Values.frontendui.spec.template.spec.containers.memory.limits }}"   
+          requests:
+            cpu: "{{ .Values.frontendui.spec.template.spec.containers.cpu.requests }}"   
+            memory: "{{ .Values.frontendui.spec.template.spec.containers.memory.requests }}"   
+    # enter the path to your image, be sure to include the correct region prefix    
+        image: {{ .Values.pdfGeneration.spec.template.spec.containers.image }}:{{ .Values.pdfGeneration.spec.template.spec.containers.version }}
+
+        livenessProbe:
+          httpGet:
+            port: {{ .Values.pdfGeneration.spec.template.spec.containers.ports.containerPort }} 
+            path: {{ .Values.pdfGeneration.spec.template.spec.containers.liveness_readiness_probe_path }}
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: {{ .Values.pdfGeneration.spec.template.spec.containers.ports.containerPort }} 
+            path: {{ .Values.pdfGeneration.spec.template.spec.containers.liveness_readiness_probe_path }}
+          failureThreshold: 10
+          initialDelaySeconds: 2
+          periodSeconds: 1
+          successThreshold: 1
+          timeoutSeconds: 5
+
+        ports:
+        - containerPort: {{ .Values.pdfGeneration.spec.template.spec.containers.ports.containerPort }}  
+        volumeMounts:
+         - name: tz-config
+           mountPath: /etc/localtime             
+      volumes:
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/Europe/Rome      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pdf-generation-service
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: {{ .Values.services.pdfGeneration.spec.ports.targetPort }}
+  selector:
+    app: core
+    role: pdf-generation
+

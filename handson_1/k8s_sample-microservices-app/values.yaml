@@ -1,0 +1,177 @@
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+ingress: {}
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+namespaces:
+  coreServicesNamespace: core-services
+  mainAppNamespace: main-app
+  frontEndNamespace: front-end
+
+services:
+  frontendui:
+    spec:
+      type: LoadBalancer
+      ports:
+        targetPort: 8080
+  pdfGeneration:
+    spec:
+      ports:
+        targetPort: 8080
+  digitalsignchecker:
+    spec:
+      ports:
+        targetPort: 8080
+  email:
+    spec:
+      ports:
+        targetPort: 8080
+
+frontendui:
+  spec:
+    replicas: 1
+    template:
+      spec:
+        containers: 
+          image: rmagnani/my_tomcat
+          version: 1.2
+          liveness_readiness_probe_path: /
+          ports:
+            containerPort: 8080
+          cpu:
+            limits: "800m"
+            requests: "200m"
+          memory:
+             limits: "1200Mi"
+             requests: "500Mi"
+  horizontalPodAutoscaler:
+    spec:
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 70
+  persistentVolume:
+    spec:
+      capacity:
+        storage: 100Gi
+
+email:
+  spec:
+    replicas: 2
+    template:
+      spec:
+        containers: 
+          image: rmagnani/my_tomcat
+          liveness_readiness_probe_path: /
+          version: 1.2
+          ports:
+            containerPort: 8080
+          cpu:
+            limits: "400m"
+            requests: "100m"
+          memory:
+             limits: "1000Mi"
+             requests: "500Mi"
+  horizontalPodAutoscaler:
+    spec:
+      minReplicas: 2
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 70
+  persistentVolume:
+    spec:
+      capacity:
+        storage: 100Gi
+      nfs:
+        server: 172.16.16.4
+        path: "/email"
+        readOnly: false
+  persistentVolumeClaim:
+    spec:
+      resources:
+        requests:
+          storage: 100Gi
+
+pdfGeneration:
+  spec:
+    replicas: 2
+    template:
+      spec:
+        containers: 
+          image: rmagnani/my_tomcat
+          liveness_readiness_probe_path: /
+          version: 1.2
+          ports:
+            containerPort: 8080
+          cpu:
+            limits: "500m"
+            requests: "100m"
+          memory:
+             limits: "800Mi"
+             requests: "400Mi"            
+          cpu:
+            limits: "500m"
+            requests: "100m"
+          memory:
+             limits: "800Mi"
+             requests: "400Mi"
+          env:
+            name: TemplatePath
+            value: /shared
+  horizontalPodAutoscaler:
+    spec:
+      minReplicas: 2
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 70
+  configMap:
+    data:
+      configPath: /config
+  persistentVolume:
+    spec:
+      capacity:
+        storage: 100Gi
+  persistentVolumeClaim:
+    spec:
+      resources:
+        requests:
+          storage: 100Gi
+
+digitalsignchecker:
+  spec:
+    replicas: 2
+    template:
+      spec:
+        containers: 
+          image: rmagnani/my_tomcat
+          liveness_readiness_probe_path: /
+          version: 1.2
+          ports:
+            containerPort: 8080
+          cpu:
+            limits: "500m"
+            requests: "100m"
+          memory:
+             limits: "800Mi"
+             requests: "400Mi"
+  horizontalPodAutoscaler:
+    spec:
+      minReplicas: 2
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 70
+  persistentVolume:
+    spec:
+      capacity:
+        storage: 100Gi
+  persistentVolumeClaim:
+    spec:
+      resources:
+        requests:
+          storage: 100Gi
+

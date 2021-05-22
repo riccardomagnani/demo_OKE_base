@@ -1,0 +1,13 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: digitalsignchecker
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  minReplicas: {{ .Values.digitalsignchecker.horizontalPodAutoscaler.spec.minReplicas }}
+  maxReplicas: {{ .Values.digitalsignchecker.horizontalPodAutoscaler.spec.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.digitalsignchecker.horizontalPodAutoscaler.spec.targetCPUUtilizationPercentage }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: digitalsignchecker

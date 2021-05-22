@@ -1,0 +1,14 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: email
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  minReplicas: {{ .Values.email.horizontalPodAutoscaler.spec.minReplicas }}
+  maxReplicas: {{ .Values.email.horizontalPodAutoscaler.spec.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.email.horizontalPodAutoscaler.spec.targetCPUUtilizationPercentage }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: email
+

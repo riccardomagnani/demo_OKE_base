@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  selector:
+    matchLabels:
+      app: core
+      role: email
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  paused: false
+  replicas: {{ .Values.email.spec.replicas }}  
+  template:
+    metadata:
+      labels:
+        app: core
+        role: email
+#        version: {{ .Values.email.spec.template.spec.containers.version }} 
+    spec:
+      containers:
+      - name: email
+        resources:
+          limits:
+            cpu: "{{ .Values.email.spec.template.spec.containers.cpu.limits }}"
+            memory: "{{ .Values.email.spec.template.spec.containers.memory.limits }}"
+          requests:
+            cpu: "{{ .Values.email.spec.template.spec.containers.cpu.requests }}"
+            memory: "{{ .Values.email.spec.template.spec.containers.memory.requests }}"   
+        image: {{ .Values.email.spec.template.spec.containers.image }}:{{ .Values.email.spec.template.spec.containers.version }} 
+
+        ports:
+        - containerPort: {{ .Values.email.spec.template.spec.containers.ports.containerPort }}  
+        volumeMounts:
+         - name: tz-config
+           mountPath: /etc/localtime                      
+      volumes:
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/Europe/Rome          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: email-service
+  namespace: {{ .Values.namespaces.coreServicesNamespace }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: {{ .Values.services.email.spec.ports.targetPort }}
+  selector:
+    app: core
+    role: email
+

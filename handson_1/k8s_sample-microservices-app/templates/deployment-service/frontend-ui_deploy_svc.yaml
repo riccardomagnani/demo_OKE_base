@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-ui
+  namespace: {{ .Values.namespaces.mainAppNamespace }}
+spec:
+  selector:
+    matchLabels:
+      app: main-app
+      role: frontend-ui
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  paused: false
+  replicas: {{ .Values.frontendui.spec.replicas }}  
+  template:
+    metadata:
+      labels:
+        app: main-app
+        role: frontend-ui
+    spec:
+      containers:
+      - name: frontend-ui
+        image: {{ .Values.frontendui.spec.template.spec.containers.image }}:{{ .Values.frontendui.spec.template.spec.containers.version }}
+        livenessProbe:
+          httpGet:
+            port: {{ .Values.frontendui.spec.template.spec.containers.ports.containerPort }}
+            path: {{ .Values.frontendui.spec.template.spec.containers.liveness_readiness_probe_path }}
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: {{ .Values.frontendui.spec.template.spec.containers.ports.containerPort }}
+            path: {{ .Values.frontendui.spec.template.spec.containers.liveness_readiness_probe_path }}
+          failureThreshold: 20
+          initialDelaySeconds: 2
+          periodSeconds: 1
+          successThreshold: 1
+          timeoutSeconds: 5
+        
+        ports:
+        - name: main-port
+          containerPort: {{ .Values.frontendui.spec.template.spec.containers.ports.containerPort }}
+        resources:
+          limits:
+            cpu: "{{ .Values.frontendui.spec.template.spec.containers.cpu.limits }}"
+            memory: "{{ .Values.frontendui.spec.template.spec.containers.memory.limits }}"
+          requests:
+            cpu: "{{ .Values.frontendui.spec.template.spec.containers.cpu.requests }}"
+            memory: "{{ .Values.frontendui.spec.template.spec.containers.memory.requests }}"
+        volumeMounts:
+        - name: tz-config
+          mountPath: /etc/localtime               
+      volumes:
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/Europe/Rome
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-ui-service
+  namespace: {{ .Values.namespaces.mainAppNamespace }}
+spec:
+  type: {{ .Values.services.frontendui.spec.type }}
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: {{ .Values.services.frontendui.spec.ports.targetPort }}
+  selector:
+    app: main-app
+    role: frontend-ui
+
