@@ -1,5 +1,15 @@
 # Demo OKE
 
+## Indice
+
+- [HOL1: Istallazione dell'applicazione via *helm*](HOL1.md) 
+
+HOL2: Stress test e Kubeview
+
+HOL3: Rolling update / Rollback & protezione dagli errori (probes)
+
+<br/>
+
 ## Creazione di un cluster OKE con QuickStart
 
 Ad esempio si usa il Quickstart per creare il cluster:
