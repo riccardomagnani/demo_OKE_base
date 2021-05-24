@@ -1,6 +1,6 @@
-## HOL1: Istallazione dell'applicazione via *helm*
+# HOL1: Istallazione dell'applicazione via *helm*
 
-Prerequisiti
+## Prerequisiti
 
 I seguenti tool devono essere installato sulla macchina client:
 
@@ -11,15 +11,17 @@ I seguenti tool devono essere installato sulla macchina client:
 
 <br/>
 
-### Clone del repository
+## Clone del repository
 
 Si effettua il clone del repository del workshop:
 
-**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**
+```bash
+git clone https://github.com/riccardomagnani/demo_OKE_base.git
+```
 
 
 
-### Istallazione dell'applicazione microservices sample
+## Istallazione dell'applicazione microservices sample
 
 Per evitare i warning di sicurezza di helm si cambia i diritti di accesso del file config di kubernetes:
 
@@ -77,3 +79,47 @@ echo $URL_APP
 curl $URL_APP
 ```
 
+### HOL1.1 Aggiornamento della sample applicationv via *helm* (optional)
+
+The values used for the installation can be modified here:
+
+```bash
+cd ~/demo_OKE_base/handson_1/k8s_sample-microservices-app
+
+vim values.yaml
+```
+
+For instance you can change the following parameters:
+
+```yaml
+pdfGeneration:
+...
+  horizontalPodAutoscaler:
+    spec:
+      minReplicas: 5
+      maxReplicas: 20
+```
+
+Check the pdfGeneration `horizontalPodAutoscaler` before applying the change to the cluster:
+
+```bash
+kubectl get horizontalPodAutoscaler -n core-services
+```
+
+As you can see all the horizontalPodAutoscaler (HPA) in the core-services has the same value therefore the same ability to scale.
+
+To check the HPA size also look at KubeView (choose the name space named "core-services" in the input box at the top). If you opened KubeView before installing sample application, then you need to refresh the whole page (F5 on Windows or Control-R on Mac) as the namespace "core-services" is not loaded.
+
+Then deploy an update using the following helm command:
+
+```bash
+helm upgrade sample-app k8s_sample-microservices-app/ --namespace sample-app --values k8s_sample-microservices-app/values.yaml
+```
+
+Check again:
+
+```bash
+kubectl get horizontalPodAutoscaler -n core-services
+```
+
+<br/>

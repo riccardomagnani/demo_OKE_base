@@ -239,7 +239,7 @@ echo $URL_APP
 curl $URL_APP
 ```
 
-### HOL2.1 Aggiornamento della sample applicationv via *helm* (optional)
+### HOL1.1 Aggiornamento della sample applicationv via *helm* (optional)
 
 The values used for the installation can be modified here:
 
