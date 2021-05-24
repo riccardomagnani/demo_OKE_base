@@ -31,7 +31,7 @@ chmod 400 ~/.kube/config
 
 <br/>
 
-Volendo si può aprire una shell e controllare il comportamento del cluster durante la fase di installazione dell'app:
+Si può aprire una shell e controllare il comportamento del cluster durante la fase di installazione dell'app:
 
 ```bash
 watch -n 1 kubectl get po -n core-services -o wide
@@ -81,7 +81,7 @@ curl $URL_APP
 
 ### HOL1.1 Aggiornamento della sample applicationv via *helm* (optional)
 
-The values used for the installation can be modified here:
+I valori utilizzati durante l'installazione possono essere modificati qua:
 
 ```bash
 cd ~/demo_OKE_base/handson_1/k8s_sample-microservices-app
@@ -89,7 +89,7 @@ cd ~/demo_OKE_base/handson_1/k8s_sample-microservices-app
 vim values.yaml
 ```
 
-For instance you can change the following parameters:
+Ad esempio si possono modificare le impostazioni del HPA o `horizontalPodAutoscaler`  del *pdfGenerator*:
 
 ```yaml
 pdfGeneration:
@@ -100,26 +100,32 @@ pdfGeneration:
       maxReplicas: 20
 ```
 
-Check the pdfGeneration `horizontalPodAutoscaler` before applying the change to the cluster:
+Si verifica pdfGeneration HPA prima di applicare il cambiamento:
 
 ```bash
 kubectl get horizontalPodAutoscaler -n core-services
 ```
 
-As you can see all the horizontalPodAutoscaler (HPA) in the core-services has the same value therefore the same ability to scale.
+Tutti i HPA hanno lo stesso valore prima del cambiamento.
 
-To check the HPA size also look at KubeView (choose the name space named "core-services" in the input box at the top). If you opened KubeView before installing sample application, then you need to refresh the whole page (F5 on Windows or Control-R on Mac) as the namespace "core-services" is not loaded.
-
-Then deploy an update using the following helm command:
+Prima di applicare il change si possono vedere le modifiche che verranno fatte:
 
 ```bash
-helm upgrade sample-app k8s_sample-microservices-app/ --namespace sample-app --values k8s_sample-microservices-app/values.yaml
+helm diff upgrade sample-app ~/demo_OKE_base/handson_1/k8s_sample-microservices-app/ --namespace sample-app --values ~/demo_OKE_base/handson_1/k8s_sample-microservices-app/values.yaml
 ```
 
-Check again:
+SI fa update del chart:
+
+```bash
+helm upgrade sample-app ~/demo_OKE_base/handson_1/k8s_sample-microservices-app/ --namespace sample-app --values ~/demo_OKE_base/handson_1/k8s_sample-microservices-app/values.yaml
+```
+
+Si verifica di nuovo il cambiamento:
 
 ```bash
 kubectl get horizontalPodAutoscaler -n core-services
 ```
 
 <br/>
+
+[HOL2: Stress test e Kubeview](HOL2.md) 
