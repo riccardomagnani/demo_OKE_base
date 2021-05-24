@@ -176,13 +176,13 @@ Events:
 
 <br/>
 
-Cancellazione dell'applicazione
+## Cancellazione dell'applicazione
 
 Per cancellare l'applicazione e il relativo servizio si esegue il seguente comando:
 
 ```bash
 cd ~/demo_OKE_base/handson_3
 
-kubectl delete -f generic-microservice-checks.yaml
+kubectl delete -f generic-microservice-nochecks.yaml
 ```
 
