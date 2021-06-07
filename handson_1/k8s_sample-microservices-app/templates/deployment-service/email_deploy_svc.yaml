@@ -36,13 +36,13 @@ spec:
 
         ports:
         - containerPort: {{ .Values.email.spec.template.spec.containers.ports.containerPort }}  
-        volumeMounts:
-         - name: tz-config
-           mountPath: /etc/localtime                      
-      volumes:
-      - name: tz-config
-        hostPath:
-          path: /usr/share/zoneinfo/Europe/Rome          
+#        volumeMounts:
+#         - name: tz-config
+#           mountPath: /etc/localtime                      
+#      volumes:
+#      - name: tz-config
+#        hostPath:
+#          path: /usr/share/zoneinfo/Europe/Rome          
 ---
 apiVersion: v1
 kind: Service

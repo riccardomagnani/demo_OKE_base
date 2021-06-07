@@ -85,14 +85,14 @@ email:
       minReplicas: 2
       maxReplicas: 10
       targetCPUUtilizationPercentage: 70
-  persistentVolume:
-    spec:
-      capacity:
-        storage: 100Gi
-      nfs:
-        server: 172.16.16.4
-        path: "/email"
-        readOnly: false
+#  persistentVolume:
+#    spec:
+#      capacity:
+#        storage: 100Gi
+#      nfs:
+#        server: 172.16.16.4
+#        path: "/email"
+#        readOnly: false
   persistentVolumeClaim:
     spec:
       resources:

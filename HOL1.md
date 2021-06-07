@@ -31,7 +31,7 @@ chmod 400 ~/.kube/config
 
 <br/>
 
-Si può aprire una shell e controllare il comportamento del cluster durante la fase di installazione dell'app:
+Si può aprire una shell per controllare il comportamento del cluster durante la fase di installazione dell'app:
 
 ```bash
 watch -n 1 kubectl get po -n core-services -o wide
